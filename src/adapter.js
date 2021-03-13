@@ -1,4 +1,6 @@
 export default {
+    // IKKE BRUK MER ENN 4 DESIMALER! ! ! 
+
     // Henter samtidig værdata fra API, ordner data i objekter.
     hentSamtidsVaerData(breddegrad, lengdegrad) {
         fetch(`https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${breddegrad}&lon=${lengdegrad}`, {mode: 'cors'})
@@ -42,5 +44,9 @@ export default {
         .catch(e => {
             console.log(e, "Feil i spørring, nesteTimersVær.");
         });
+    },
+    // Henter geografiske koordinater(bredde -lengdegrad), gitt 'stedsNavn' parameteren.
+    hentGeoKoordinater(stedsNavn) {
+        fetch(`https://nominatim.openstreetmap.org/search?q=${f}&format=geojson`, {mode: 'cors'})
     }
 }
