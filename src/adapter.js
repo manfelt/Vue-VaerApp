@@ -47,6 +47,22 @@ export default {
     },
     // Henter geografiske koordinater(bredde -lengdegrad), gitt 'stedsNavn' parameteren.
     hentGeoKoordinater(stedsNavn) {
-        fetch(`https://nominatim.openstreetmap.org/search?q=${f}&format=geojson`, {mode: 'cors'})
+        fetch(`https://nominatim.openstreetmap.org/search?q=${stedsNavn}&format=geojson`, {mode: 'cors'})
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(response) {
+            console.log("hentGeokoordinater OK")
+            let koordinater = [];
+            koordinater.push({
+                breddegrad: response.features.geometry.coordinates[0],
+                lengdegrad: response.features.geometry.coordinates[1]
+            });
+        console.log(koordinater);
+        return koordinater;
+        })
+    .catch(e => {
+        console.log(e, "Feil i spørring, hentGeokoordinater.")
+        });
     }
 }
