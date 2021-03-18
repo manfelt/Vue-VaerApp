@@ -2,19 +2,47 @@
   <div id="app">
     <main>
       <div class="søk-boks">
-        <input type="text" name="" id="" class="søk-bar" placeholder="Søk..."/>
+        <input type="text"
+          class="søk-bar"
+          placeholder="Søk..."
+          v-model="query"
+          @keypress="skaffVaer"/>
+      </div>
+
+      <div class="vaer-wrap">
+        <div class="sted-boks">
+          <div class="sted">Blokksberg</div>
+            <div class="dato">Fredag 13. August</div>
+        </div>
       </div>
     </main>
   </div>
 </template>
 
 <script>
+	import VaerApi from './adapter.js'
+  import Kort from './Kort'
+
+  Kort
+  VaerApi.hentSamtidsVaerData(62, 10);
 
 export default {
   name: 'App',
   data () {
+    return {
+      query: '',
+      } 
+     },
+    methods: {
+      skaffVaer (e) {
+        if (e.key == "Enter") {
+          VaerApi.hentGeoKoordinater(this.query); 
+        }
+      }
+  
+    }
 
-  }
+ 
 
 
 }
