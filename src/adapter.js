@@ -46,6 +46,7 @@ export default {
         });
     },
     // Henter geografiske koordinater(bredde -lengdegrad), gitt 'stedsNavn' parameteren.
+    // 'breddeInteger', 'lengdeInteger' lagrer verdien av koordinater, omgjort til integer, kortet ned ant. desimaler til 2.
     hentGeoKoordinater(stedsNavn) {
         fetch(`https://nominatim.openstreetmap.org/search?q=${stedsNavn}&format=geojson`, {mode: 'cors'})
         .then(function(response) {
@@ -54,15 +55,17 @@ export default {
         .then(function(response) {
             console.log("hentGeokoordinater OK")
             let koordinater = [];
+            let breddegrad = response.features[0].geometry.coordinates[0].toFixed(2);
+            let lengdegrad = response.features[0].geometry.coordinates[1].toFixed(2);
             koordinater.push({
-                breddegrad: response.features.geometry.coordinates[0],
-                lengdegrad: response.features.geometry.coordinates[1]
+                breddegrad: breddegrad,
+                lengdegrad: lengdegrad
             });
-        console.log(koordinater);
-        return koordinater;
+            console.log(breddegrad, lengdegrad);
+            return breddegrad, lengdegrad;
         })
-    .catch(e => {
-        console.log(e, "Feil i spørring, hentGeokoordinater.")
+        .catch(e => {
+            console.log(e, "Feil i spørring, hentGeokoordinater.")
         });
     }
 }
