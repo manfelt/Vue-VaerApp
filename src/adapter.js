@@ -1,9 +1,13 @@
 export default {
+
     // IKKE BRUK MER ENN 4 DESIMALER! ! ! 
 
     // Henter samtidig værdata fra API, ordner data i objekter.
-    hentSamtidsVaerData(breddegrad, lengdegrad) {
-        fetch(`https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${breddegrad}&lon=${lengdegrad}`, {mode: 'cors'})
+    hentSamtidsVaerData(koordinater) {
+        if (typeof(koordinater) == 'undefined') {
+            console.log("koordinater er udefinert")
+          }
+        fetch(`https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${koordinater[0][1]}&lon=${koordinater[0][0]}`, {mode: 'cors'})
             .then(function(response) {
                 return response.json();
             })
@@ -38,34 +42,11 @@ export default {
                     forhold: response.properties.timeseries[i].data.next_1_hours.summary.symbol_code,
                     nedbor: response.properties.timeseries[i].data.next_1_hours.details.precipitation_amount
                 });
-            console.log(dokumenter);
+            /* console.log(dokumenter); */
             return dokumenter;
             })
         .catch(e => {
             console.log(e, "Feil i spørring, nesteTimersVær.");
-        });
-    },
-    // Henter geografiske koordinater(bredde -lengdegrad), gitt 'stedsNavn' parameteren.
-    // 'breddeInteger', 'lengdeInteger' lagrer verdien av koordinater, omgjort til integer, kortet ned ant. desimaler til 2.
-    hentGeoKoordinater(stedsNavn) {
-        fetch(`https://nominatim.openstreetmap.org/search?q=${stedsNavn}&format=geojson`, {mode: 'cors'})
-        .then(function(response) {
-            return response.json();
-        })
-        .then(function(response) {
-            console.log("hentGeokoordinater OK")
-            let koordinater = [];
-            let breddegrad = response.features[0].geometry.coordinates[0].toFixed(2);
-            let lengdegrad = response.features[0].geometry.coordinates[1].toFixed(2);
-            koordinater.push({
-                breddegrad: breddegrad,
-                lengdegrad: lengdegrad
-            });
-            console.log(breddegrad, lengdegrad);
-            return breddegrad, lengdegrad;
-        })
-        .catch(e => {
-            console.log(e, "Feil i spørring, hentGeokoordinater.")
         });
     }
 }
