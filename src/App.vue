@@ -20,32 +20,51 @@
 </template>
 
 <script>
-	import VaerApi from './adapter.js'
+  
+	import VaerApi from './adapter'
   import Kort from './Kort'
 
-  Kort
-  VaerApi.hentSamtidsVaerData(62, 10);
+ Kort
 
 export default {
   name: 'App',
   data () {
     return {
       query: '',
-      } 
+      koordinater: [],
+      weather: {}
+      }
      },
     methods: {
       skaffVaer (e) {
         if (e.key == "Enter") {
-          VaerApi.hentGeoKoordinater(this.query); 
+          fetch(`https://nominatim.openstreetmap.org/search?q=${this.query}&format=geojson`, {mode: 'cors'})
+          .then(function(response) {
+            return response.json();
+        })
+        .then(function(response) {
+            console.log("hentGeokoordinater OK")
+            let koordinater = [];
+            let lengdegrad = response.features[0].geometry.coordinates[0].toFixed(2);
+            let breddegrad = response.features[0].geometry.coordinates[1].toFixed(2);
+            koordinater.push({
+                0: lengdegrad,
+                1: breddegrad
+            });
+           /*  console.log(koordinater[0][0], koordinater[0][1]); */
+            return koordinater;
+        })
+        .then(this.setResults);
+        }
+      },
+        setResults (results) {
+          this.weather = VaerApi.hentSamtidsVaerData(results)
+          return results;
         }
       }
-  
-    }
-
- 
-
-
 }
+
+
 </script>
 
 <style>
