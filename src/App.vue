@@ -11,10 +11,16 @@
 
       <div class="vaer-wrap">
         <div class="sted-boks">
-          <div class="sted">Blokksberg</div>
-            <div class="dato">Fredag 13. August</div>
+          <div class="sted">{{ query }}</div>
+            <div class="dato">{{ byggDato() }}</div>
         </div>
       </div>
+
+      <div class="content">
+        <div class="content-grid">
+          {{ setResult }}
+        </div>
+      </div>  
     </main>
   </div>
 </template>
@@ -23,45 +29,60 @@
   
 	import VaerApi from './adapter'
   import Kort from './Kort'
+  import Geografi from './koordinaterAdapter'
 
+  import { reactive } from "vue";
  Kort
 
 export default {
   name: 'App',
-  data () {
-    return {
-      query: '',
-      koordinater: [],
-      weather: {}
-      }
-     },
-    methods: {
-      skaffVaer (e) {
+  components: {
+    VaerApi,
+    Geografi,
+  },
+
+    setup() {
+    const state = reactive({
+      InputValue: "",
+      results: [
+        { id: "" },
+        { sted: "" },
+        { temperatur: "" },
+        { weather_state_img: "" },
+      ],
+      
+      state: false,
+    });
+    
+
+       const skaffVaer = (e) => {
         if (e.key == "Enter") {
-          fetch(`https://nominatim.openstreetmap.org/search?q=${this.query}&format=geojson`, {mode: 'cors'})
-          .then(function(response) {
-            return response.json();
-        })
-        .then(function(response) {
-            console.log("hentGeokoordinater OK")
-            let koordinater = [];
-            let lengdegrad = response.features[0].geometry.coordinates[0].toFixed(2);
-            let breddegrad = response.features[0].geometry.coordinates[1].toFixed(2);
-            koordinater.push({
-                0: lengdegrad,
-                1: breddegrad
-            });
-           /*  console.log(koordinater[0][0], koordinater[0][1]); */
-            return koordinater;
-        })
-        .then(this.setResults);
+           const koordinater = Geografi.hentGeoKoordinater(this.query);
+           const sted = this.query;
+            setResults(koordinater);
+            console.log(sted);
         }
-      },
-        setResults (results) {
-          this.weather = VaerApi.hentSamtidsVaerData(results)
-          return results;
+      };
+         const setResults = (koordinater) => {
+          this.Vaer = VaerApi.hentSamtidsVaerData(koordinater);
+          state.state = true;
         }
+          const byggDato = () => {
+          let d = new Date();
+          let dager = ["Søndag", "Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag", "Søndag"];
+          let maaneder = ["Januar", "Februar", "Mars", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Desember"];
+
+          let dag = dager[d.getDay()];
+          let dato = d.getDate();
+          let maaned = maaneder[d.getMonth()];
+
+          return `${dag} ${dato} ${maaned}`;
+        }
+      return {
+        skaffVaer,
+        byggDato,
       }
+    }
 }
 
 
