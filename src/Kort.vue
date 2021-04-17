@@ -1,6 +1,7 @@
 <template>
 	<div class='kort'>
 		<slot>
+			{{ setResults() }}
 		</slot>
 	</div>
 </template>
