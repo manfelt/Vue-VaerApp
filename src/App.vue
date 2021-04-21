@@ -8,6 +8,7 @@
           v-model="query"
           @keypress="skaffVaer"/>
       </div>
+      
 
       <div class="vaer-wrap">
         <div class="sted-boks">
@@ -30,44 +31,34 @@
 	import VaerApi from './adapter'
   import Kort from './Kort'
   import Geografi from './koordinaterAdapter'
-
-  import { reactive } from "vue";
  Kort
 
 export default {
   name: 'App',
-  components: {
+  Components: {
     VaerApi,
     Geografi,
   },
+  data() {
+    return {
+      query: ''
+    }
+  },
 
-    setup() {
-    const state = reactive({
-      InputValue: "",
-      results: [
-        { id: "" },
-        { sted: "" },
-        { temperatur: "" },
-        { weather_state_img: "" },
-      ],
-      
-      state: false,
-    });
-    
-
-       const skaffVaer = (e) => {
+    methods: {
+        skaffVaer  (e)  {
         if (e.key == "Enter") {
            const koordinater = Geografi.hentGeoKoordinater(this.query);
            const sted = this.query;
-            setResults(koordinater);
+            this.setResults(koordinater);
             console.log(sted);
+
         }
-      };
-         const setResults = (koordinater) => {
+      },
+          setResults (koordinater)  {
           this.Vaer = VaerApi.hentSamtidsVaerData(koordinater);
-          state.state = true;
-        }
-          const byggDato = () => {
+        },
+           byggDato  ()  {
           let d = new Date();
           let dager = ["Søndag", "Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag", "Søndag"];
           let maaneder = ["Januar", "Februar", "Mars", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Desember"];
@@ -78,10 +69,6 @@ export default {
 
           return `${dag} ${dato} ${maaned}`;
         }
-      return {
-        skaffVaer,
-        byggDato,
-      }
     }
 }
 
