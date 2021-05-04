@@ -11,11 +11,12 @@
       
 
       <div class="vaer-wrap">
+        <div class="dato">{{ byggDato() }}</div>
+        <br>
         <div class="sted-boks">
-          <div class="sted">{{ query }}</div>
-          <div class="sted">{{ Vaer }}</div>
-          <div class="sted">{{ koordinater }}</div>
-            <div class="dato">{{ byggDato() }}</div>
+          <div class="sted">{{ sted }}</div>
+          <div class="sted">{{ Vaer }} ℃</div>
+            
         </div>
       </div>
 
@@ -36,7 +37,7 @@
   Kort
 
 export default {
-  name: 'App',
+ el: '#app',
   Components: {
     VaerApi,
     Geografi,
@@ -44,8 +45,9 @@ export default {
   data() {
     return {
       query: '',
-      Vaer: '',
-      koordinater: []
+      Vaer: 'tmp',
+      koordinater: [],
+      sted: ''
     }
   },
     //{0: "10.74", 1: "59.91"}
@@ -53,12 +55,13 @@ export default {
         skaffVaer  (e)  {
         var koordinater = this.koordinater
         if (e.key == "Enter") {
-           koordinater = Geografi.hentGeoKoordinater(this.query);
+           this.koordinater = Geografi.hentGeoKoordinater(this.query);
+           this.sted = this.query;
                   fetch(`https://nominatim.openstreetmap.org/search?q=${this.query}&format=geojson`, {mode: 'cors'})
                   .then(function(response) {
                       return response.json();
                   })
-                  .then(function(response) {
+                  .then((response) => {
                       console.log("hentGeokoordinater OK")
                       koordinater = [];
                       let breddegrad = response.features[0].geometry.coordinates[0].toFixed(2);
@@ -68,12 +71,13 @@ export default {
                           lengdegrad: lengdegrad
                       });
                      
-                      fetch(`https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${koordinater.breddegrad}&lon=${koordinater.lengdegrad}`, {mode: 'cors'})
+                      fetch(`https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${koordinater.lengdegrad}&lon=${koordinater.breddegrad}`, {mode: 'cors'})
                           .then(function(response) {
                               return response.json();
                           })
-                          .then(function(response) {
+                          .then((response) => {
                               console.log("SamtidsVaerData OK:", response.properties.timeseries[0].data.instant.details.air_temperature, response.properties.timeseries[0].data.next_1_hours.summary.symbol_code, response.properties.timeseries[0].data.instant.details.wind_speed)
+                              this.Vaer = response.properties.timeseries[0].data.instant.details.air_temperature
                               return {
                                   temperatur: response.properties.timeseries[0].data.instant.details.air_temperature,
                                   forhold: response.properties.timeseries[0].data.next_1_hours.summary.symbol_code,
@@ -86,14 +90,8 @@ export default {
                   .catch(e => {
                       console.log(e, "Feil i spørring, hentGeokoordinater.")
                   });
-              
-
-        }
+              }
       },
-          setResults (koordinater)  {
-          this.Vaer = VaerApi.hentSamtidsVaerData(koordinater);
-          console.log('this.Vaer');
-        },
            byggDato  ()  {
           let d = new Date();
           let dager = ["Søndag", "Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag", "Søndag"];
