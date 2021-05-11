@@ -1,6 +1,10 @@
 <template>
   <div id="app">
-    <main>
+    <main> 
+      <div>
+        <p>data er hentet via meteorologisk institutts API: https://api.met.no</p>
+        <p>koordinater er skaffet via openstreetmap nopminatim, brukt som input til meteorologisk institutts koordinatsystem.</p>
+      </div>
       <div class="søk-boks">
         <input type="text"
           class="søk-bar"
@@ -15,39 +19,52 @@
         <br>
         <div class="sted-boks">
           <div class="sted">{{ sted }}</div>
-          <div class="sted">{{ Vaer }} ℃</div>
-            
+          <div class="sted">{{ temperatur }} ℃</div>
+          <div class="sted">{{ forhold }}</div>
+          <div class="sted">{{ nedbor }} mm</div>
+          <div class="sted">{{ vindRetning }} °vind</div>
+          <div class="sted">{{ vindHastighet }} m/s</div>
+
+          <VaerForholdBilde 
+            :class='vaerForholdMedium' 
+            :passendeVaerGrafikk='forhold'
+          />
+
+          <div class='valgtStylingPreset'>
+            <img v-bind:src="'./assets/ikoner/' +  bilde" />
+          </div>
+
         </div>
       </div>
 
-      <div class="content">
-        <div class="content-grid">
-          {{ setResult }}
-        </div>
-      </div>  
+     
     </main>
   </div>
 </template>
 
 <script>
   
-	import VaerApi from './adapter'
-  import Kort from './Kort'
-  import Geografi from './koordinaterAdapter'
-  Kort
+  import Geografi from './koordinaterAdapter';
+  import VaerForholdBilde from './ForholdTilGrafikk';
+
 
 export default {
  el: '#app',
-  Components: {
-    VaerApi,
-    Geografi,
+  components: {
+    VaerForholdBilde
   },
   data() {
     return {
       query: '',
-      Vaer: 'tmp',
       koordinater: [],
-      sted: ''
+      sted: '',
+      temperatur: 'tmp',
+      forhold: 'rain',
+      nedbor: '',
+      vindRetning: 'vindRetning',
+      vindHastighet: 'vindHastighet',
+      bilde: 'cloudy.svg',
+      state: false
     }
   },
     //{0: "10.74", 1: "59.91"}
@@ -77,7 +94,13 @@ export default {
                           })
                           .then((response) => {
                               console.log("SamtidsVaerData OK:", response.properties.timeseries[0].data.instant.details.air_temperature, response.properties.timeseries[0].data.next_1_hours.summary.symbol_code, response.properties.timeseries[0].data.instant.details.wind_speed)
-                              this.Vaer = response.properties.timeseries[0].data.instant.details.air_temperature
+                              this.temperatur = response.properties.timeseries[0].data.instant.details.air_temperature
+                              this.forhold = response.properties.timeseries[0].data.next_1_hours.summary.symbol_code,
+                              this.nedbor = response.properties.timeseries[0].data.next_1_hours.details.precipitation_amount,
+                              this.vindRetning = response.properties.timeseries[0].data.instant.details.wind_from_direction,
+                              this.vindHastighet = response.properties.timeseries[0].data.instant.details.wind_speed
+
+                              this.state = true;
                               return {
                                   temperatur: response.properties.timeseries[0].data.instant.details.air_temperature,
                                   forhold: response.properties.timeseries[0].data.next_1_hours.summary.symbol_code,
