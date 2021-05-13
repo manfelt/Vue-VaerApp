@@ -30,8 +30,8 @@
             :passendeVaerGrafikk='forhold'
           />
 
-          <div class='valgtStylingPreset'>
-            <img v-bind:src="'./assets/ikoner/' +  bilde" />
+          <div class="vaer-forhold-medium">
+            <img :src="passendeVaerGrafikke" />
           </div>
 
         </div>
@@ -43,6 +43,19 @@
 </template>
 
 <script>
+
+let vaerForholdTilGrafikkMap = {
+	'clearsky_day': require('./assets/ikoner/01d.svg'),
+	'clear_night': require('./assets/ikoner/01d.svg'),
+	'cloudy': require('./assets/ikoner/04.svg'),
+	'few_clouds': require('./assets/ikoner/01d.svg'),
+	'fair_day': require('./assets/ikoner/01d.svg'),
+	'partlycloudy_day': require('./assets/ikoner/01d.svg'),
+	'partlycloudy_night': require('./assets/ikoner/01d.svg'),
+	'rain': require('./assets/ikoner/09.svg')
+}
+
+
   
   import Geografi from './koordinaterAdapter';
   import VaerForholdBilde from './ForholdTilGrafikk';
@@ -126,7 +139,18 @@ export default {
 
           return `${dag} ${dato} ${maaned}`;
         }
-    }
+    },
+    computed: {
+		valgtStylingPreset(){
+			return { 'vaer-forhold-stor': this.preset === 'stor',
+			'vaerForholdMedium': this.preset === 'medium',
+			'vaer-forhold-liten': this.preset === 'liten' }
+		},
+		passendeVaerGrafikke(){
+			return vaerForholdTilGrafikkMap[this.forhold];
+		}
+	}
+
 }
 
 
@@ -179,6 +203,14 @@ main {
   background-color: rgba(255, 255, 255, 0.15);
   transition: 0.5s;
   border-radius: 5px;
+}
+
+img {
+  width: 20%;
+}
+
+.vaer-forhold-medium img{
+	filter: drop-shadow(-4.5px 3.5px 0 var(--weather-double-color));
 }
 
 </style>
