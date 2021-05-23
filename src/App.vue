@@ -1,31 +1,36 @@
 <template>
   <div id="app">
     <main> 
-      <div>
-        <p>data er hentet via meteorologisk institutts API: https://api.met.no</p>
-        <p>koordinater er skaffet via openstreetmap nopminatim, brukt som input til meteorologisk institutts koordinatsystem.</p>
-      </div>
+
       <div class="søk-boks">
         <input type="text"
           class="søk-bar"
-          placeholder="Søk..."
+          placeholder="Søk sted..."
           v-model="query"
           @keypress="skaffVaer"/>
       </div>
       
       <kort-view>
       <div class="vaer-wrap">
-        <div class="dato">{{ byggDato() }}</div>
-        <br>
-        <div class="sted-boks">
-          <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
-<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.25 19.25L15.5 15.5M4.75 11C4.75 7.54822 7.54822 4.75 11 4.75C14.4518 4.75 17.25 7.54822 17.25 11C17.25 14.4518 14.4518 17.25 11 17.25C7.54822 17.25 4.75 14.4518 4.75 11Z"/>
-</svg>
-          <div class="sted">{{ sted }}</div>
+          <div class="dato">{{ byggDato() }}</div>
+
+          <br>
+
+          <div class="sted-boks">
+
+          <div class="sted"><h1>{{ sted }}</h1></div>
           <div class="sted">{{ temperatur }} ℃</div>
           <div class="sted">{{ forhold }}</div>
+
+          <br>
+
+          <h2>Nedbør</h2>
           <div class="sted">{{ nedbor }} mm</div>
-           vindretning <img class="vind-retning" :src="skaffHimmelretning">
+
+          <br>
+
+          <h2>Vind</h2>
+          <img class="vind-retning" :src="skaffHimmelretning">
           <div class="sted">{{ vindHastighet }} m/s</div>
 
           <VaerForholdBilde 
@@ -41,6 +46,10 @@
       </div>
       </kort-view>
 
+      <div class="beskrivelse">
+        <p>data er hentet via meteorologisk institutts API: <a href="https://api.met.no">https://api.met.no</a></p>
+        <p>koordinater er skaffet via openstreetmap nopminatim, brukt som input til meteorologisk institutts koordinatsystem.</p>
+      </div>
      
     </main>
   </div>
@@ -50,17 +59,19 @@
 
 let vaerForholdTilGrafikkMap = {
 	'clearsky_day': require('./assets/ikoner/01d.svg'),
-	'clear_night': require('./assets/ikoner/01d.svg'),
+	'clear_night': require('./assets/ikoner/01n.svg'),
 	'cloudy': require('./assets/ikoner/04.svg'),
-	'few_clouds': require('./assets/ikoner/01d.svg'),
-	'fair_day': require('./assets/ikoner/01d.svg'),
-	'partlycloudy_day': require('./assets/ikoner/01d.svg'),
-	'partlycloudy_night': require('./assets/ikoner/01d.svg'),
-	'rain': require('./assets/ikoner/09.svg')
+	'few_clouds': require('./assets/ikoner/02d.svg'),
+	'fair_day': require('./assets/ikoner/02n.svg'),
+  'fair_night': require('./assets/ikoner/02n.svg'),
+	'partlycloudy_day': require('./assets/ikoner/03d.svg'),
+	'partlycloudy_night': require('./assets/ikoner/03n.svg'),
+	'rain': require('./assets/ikoner/09.svg'),
+  'heavyrain': require('./assets/ikoner/10.svg'),
+  'lightrain': require('./assets/ikoner/10.svg')
 }
 
 
-  
   import Geografi from './koordinaterAdapter';
   import VaerForholdBilde from './ForholdTilGrafikk';
   import Kort from './Kort';
@@ -92,7 +103,10 @@ export default {
         var koordinater = this.koordinater
         if (e.key == "Enter") {
            this.koordinater = Geografi.hentGeoKoordinater(this.query);
-           this.sted = this.query;
+           // Gjør at første bokstav i stedsnavn er storbokstav.
+           this.sted = this.query.charAt(0).toUpperCase() + this.query.slice(1);
+
+                  // Henter samtidig værdata fra API, ordner data i objekter.
                   fetch(`https://nominatim.openstreetmap.org/search?q=${this.query}&format=geojson`, {mode: 'cors'})
                   .then(function(response) {
                       return response.json();
@@ -106,7 +120,8 @@ export default {
                           breddegrad: breddegrad,
                           lengdegrad: lengdegrad
                       });
-                     
+
+                      // værdata fra meteorologisk institutt. IKKE BRUK MER ENN 4 DESIMALER!
                       fetch(`https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${koordinater.lengdegrad}&lon=${koordinater.breddegrad}`, {mode: 'cors'})
                           .then(function(response) {
                               return response.json();
@@ -205,7 +220,13 @@ main {
   min-height: 100vh;
   padding: 25px;
 
-  background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.75));
+  background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.25), rgba(7 95 82 / 75%));
+}
+
+
+.beskrivelse {
+  margin-top: 25px;
+  background: rgba(239 251 255);
 }
 
 .søk-boks {
@@ -237,7 +258,7 @@ main {
 
 .vind-retning {
   width: 30px;
-  background: yellow;
+  background: #FFC233;
 }
 
 img {
