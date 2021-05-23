@@ -1,7 +1,7 @@
 <template>
 	<div class='kort'>
 		<slot>
-			{{ setResults() }}
+			
 		</slot>
 	</div>
 </template>
@@ -13,9 +13,11 @@ export default {
 <style>
 .kort {
 	box-sizing: border-box;
-    width: 100%;
+    width: 30%;
 	height: 100%;
-	border-radius: 20px;
-	border: 2.9px solid #92c3f5;
+	border-radius: 0px;
+	border: 2.7px solid #1167be00;
+	background: rgba(239 251 255);
+	box-sizing: border-box;
 }
 </style>
