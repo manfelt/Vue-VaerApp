@@ -10,7 +10,7 @@
           @keypress="skaffVaer"/>
       </div>
       
-      <kort-view>
+      <kort-view v-if="state">
       <div class="vaer-wrap">
           <div class="dato">{{ byggDato() }}</div>
 
@@ -47,8 +47,8 @@
       </kort-view>
 
       <div class="beskrivelse">
-        <p>data er hentet via meteorologisk institutts API: <a href="https://api.met.no">https://api.met.no</a></p>
-        <p>koordinater er skaffet via openstreetmap nopminatim, brukt som input til meteorologisk institutts koordinatsystem.</p>
+        <p>Data er hentet via meteorologisk institutts API: <a href="https://api.met.no">https://api.met.no</a></p>
+        <p>Input til meteorologisk institutts koordinatsystem skaffes via APIen 'openstreetmap nominatim'. </p>
       </div>
      
     </main>
@@ -226,7 +226,15 @@ main {
 
 .beskrivelse {
   margin-top: 25px;
-  background: rgba(239 251 255);
+  padding-left: 10px;
+  margin: .5em auto;
+  color: white;
+}
+
+  a {
+    color: rgba(227, 227, 227, 0.78);
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
 }
 
 .søk-boks {
