@@ -39,7 +39,7 @@
           />
 
           <div class="vaer-forhold-medium">
-            <img :src="passendeVaerGrafikke" />
+            <img :src="passendeVaerGrafikk" />
           </div>
 
         </div>
@@ -48,7 +48,7 @@
 
       <div class="beskrivelse">
         <p>Data er hentet via meteorologisk institutts API: <a href="https://api.met.no">https://api.met.no</a></p>
-        <p>Input til meteorologisk institutts koordinatsystem skaffes via APIen 'openstreetmap nominatim'. </p>
+        <p>Input til meteorologisk institutts koordinatsystem skaffes via openstreetmaps API, 'nominatim'. </p>
       </div>
      
     </main>
@@ -57,12 +57,14 @@
 
 <script>
 
+
+  // Mapper grafikk fra værfohold. (Dvs, 'regn' vil gi 'regn.svg'.)
 let vaerForholdTilGrafikkMap = {
 	'clearsky_day': require('./assets/ikoner/01d.svg'),
-	'clear_night': require('./assets/ikoner/01n.svg'),
+	'clearsky_night': require('./assets/ikoner/01n.svg'),
 	'cloudy': require('./assets/ikoner/04.svg'),
 	'few_clouds': require('./assets/ikoner/02d.svg'),
-	'fair_day': require('./assets/ikoner/02n.svg'),
+	'fair_day': require('./assets/ikoner/02d.svg'),
   'fair_night': require('./assets/ikoner/02n.svg'),
 	'partlycloudy_day': require('./assets/ikoner/03d.svg'),
 	'partlycloudy_night': require('./assets/ikoner/03n.svg'),
@@ -168,19 +170,23 @@ export default {
         'vaer-forhold-liten': this.preset === 'liten' }
       },
 
-    passendeVaerGrafikke(){
+
+    // 
+    passendeVaerGrafikk(){
         return vaerForholdTilGrafikkMap[this.forhold];
       },
 
+    // Omdanner vinkelgrader til himmelretninger som NØ, SV, N etc. 
     skaffHimmelretning() {
-      // 8 himmelretninger
+      // 8 himmelretninger av ant. mulige defineres
       const graderPrRetning = 360 / 8;
 
       const vinkel = this.vindRetning
 
-      // Trigonometri
+      // Trigonometrisk kalkulasjon. Man
       const utjevnetVinkel = vinkel + graderPrRetning / 2;
 
+      // if -sjekker 
       return (utjevnetVinkel >= 0 * graderPrRetning && utjevnetVinkel < 1 * graderPrRetning) ? require('./assets/ikoner/nord.svg')
          : (utjevnetVinkel >= 1 * graderPrRetning && utjevnetVinkel < 2 * graderPrRetning) ? require('./assets/ikoner/nordøst.svg')
           : (utjevnetVinkel >= 2 * graderPrRetning && utjevnetVinkel < 3 * graderPrRetning) ? require('./assets/ikoner/øst.svg')
