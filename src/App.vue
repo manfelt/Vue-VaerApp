@@ -171,7 +171,7 @@ export default {
       },
 
 
-    // 
+    // Finner frem riktig bilde til forholdskoden
     passendeVaerGrafikk(){
         return vaerForholdTilGrafikkMap[this.forhold];
       },
